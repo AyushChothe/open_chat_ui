@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:open_chat_ui/controllers/ollama_controller.dart';
+import 'package:open_chat_ui/utils/utils.dart';
 
 class ModelSelector extends HookConsumerWidget {
   const ModelSelector({super.key});
@@ -8,34 +10,67 @@ class ModelSelector extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ollamaCtrl = ref.watch(ollamaControllerProvider.notifier);
-    final ollama = ref.watch(ollamaControllerProvider);
     final modelsValue = ref.watch(modelsProvider);
-    return Card(
-      child: modelsValue.when(
-        data: (models) => SizedBox(
-          width: double.maxFinite,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            child: DropdownButton(
-              underline: const SizedBox.shrink(),
-              hint: const Text('Select Model'),
-              value: ollama.selectedModel,
-              items: models
-                  .map(
-                    (e) => DropdownMenuItem(
-                      value: e,
-                      child: Text('${e.model}${e.size}'),
-                    ),
-                  )
-                  .toList(),
-              onChanged: ollamaCtrl.selectModel,
+    return modelsValue.when(
+      data: (models) => Row(
+        children: [
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, box) {
+                return DropdownMenu(
+                  inputDecorationTheme: const InputDecorationTheme(
+                    filled: true,
+                  ),
+                  enableFilter: true,
+                  requestFocusOnTap: true,
+                  leadingIcon: const Icon(Icons.search),
+                  label: const Text('Model'),
+                  hintText: 'Select a model',
+                  width: box.maxWidth,
+                  dropdownMenuEntries: models
+                      .map(
+                        (e) => DropdownMenuEntry(
+                          value: e,
+                          label: '${e.model}',
+                          leadingIcon: const Icon(Icons.lightbulb_rounded),
+                          labelWidget: Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: e.model,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: ' (${Utils.bytesToSize(e.size)})',
+                                  style:
+                                      Theme.of(context).textTheme.labelMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onSelected: ollamaCtrl.selectModel,
+                );
+              },
             ),
           ),
-        ),
-        error: (e, st) => Text(modelsValue.error.toString()),
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+          const Gap(4),
+          IconButton.filledTonal(
+            onPressed: () {
+              ref.invalidate(modelsProvider);
+              Utils.showMessage('Models refreshed');
+            },
+            icon: const Icon(Icons.refresh_rounded),
+          )
+        ],
+      ),
+      error: (e, st) => Text(modelsValue.error.toString()),
+      loading: () => const Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }

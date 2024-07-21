@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:open_chat_ui/constants/app_constants.dart';
 import 'package:open_chat_ui/constants/router.dart';
 
 class App extends StatelessWidget {
@@ -9,6 +10,8 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProviderScope(
       child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        scaffoldMessengerKey: AppConstants.navKey,
         routerConfig: router,
       ),
     );

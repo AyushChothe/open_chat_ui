@@ -1,6 +1,7 @@
 import 'package:ollama_dart/ollama_dart.dart';
 import 'package:open_chat_ui/enums/model_status.dart';
 import 'package:open_chat_ui/models/model_state.dart';
+import 'package:open_chat_ui/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'ollama_controller.g.dart';
@@ -93,6 +94,7 @@ class OllamaController extends _$OllamaController {
         }
       }
     } catch (e) {
+      Utils.showMessage('Something went wrong');
       state = state.copyWith(status: ModelStatus.error);
       rethrow;
     } finally {

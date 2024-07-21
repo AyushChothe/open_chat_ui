@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gap/gap.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:open_chat_ui/controllers/ollama_controller.dart';
 import 'package:open_chat_ui/enums/model_status.dart';
@@ -12,7 +13,6 @@ class BottomInputBar extends HookConsumerWidget {
     final ollamaCtrl = ref.watch(ollamaControllerProvider.notifier);
     final ollama = ref.watch(ollamaControllerProvider);
     final messageCtrl = useTextEditingController();
-
     final canSend = useMemoized(
       () =>
           ollama.selectedModel != null &&
@@ -24,34 +24,41 @@ class BottomInputBar extends HookConsumerWidget {
       ],
     );
 
+    final sendMessage = useCallback(() {
+      ollamaCtrl.sendMessage(messageCtrl.text.trim());
+      messageCtrl.clear();
+    });
+
     return Padding(
       padding: const EdgeInsets.all(4),
       child: Row(
         children: [
           Expanded(
             child: TextField(
+              autofocus: true,
+              maxLines: 3,
               controller: messageCtrl,
               decoration: const InputDecoration(
-                hintText: 'Type a message',
                 filled: true,
-                isDense: true,
+                hintText: 'Type a message',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12)),
                 ),
               ),
-              maxLines: 3,
             ),
           ),
-          const SizedBox(width: 4),
-          IconButton.filled(
-            onPressed: canSend
-                ? () {
-                    ollamaCtrl.sendMessage(messageCtrl.text.trim());
-                    messageCtrl.clear();
-                  }
-                : null,
-            icon: const Icon(Icons.send),
-          ),
+          const Gap(8),
+          SizedBox(
+            width: 40,
+            child: Center(
+              child: (ollama.status == ModelStatus.running)
+                  ? const CircularProgressIndicator()
+                  : IconButton.filled(
+                      onPressed: canSend ? sendMessage : null,
+                      icon: const Icon(Icons.play_arrow_rounded),
+                    ),
+            ),
+          )
         ],
       ),
     );
