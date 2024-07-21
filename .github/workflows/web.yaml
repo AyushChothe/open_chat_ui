@@ -20,3 +20,4 @@ jobs:
         with:
           workingDir: .
           targetBranch: gh-pages
+          customArgs: "--target=lib/main_production.dart"
