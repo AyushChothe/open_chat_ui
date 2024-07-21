@@ -1,4 +1,3 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ollama_dart/ollama_dart.dart';
 import 'package:open_chat_ui/enums/model_status.dart';
 import 'package:open_chat_ui/models/model_state.dart';
@@ -6,20 +5,25 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'ollama_controller.g.dart';
 
-final ollamaCtrlProvider = StateNotifierProvider<OllamaController, ModelState>(
-  (ref) => OllamaController(),
-);
-
 @riverpod
+String? ollamaBaseUrl(OllamaBaseUrlRef ref) => null;
+
+@Riverpod(dependencies: [OllamaController])
 Future<List<Model>> models(ModelsRef ref) {
-  final ollamaCtrl = ref.watch(ollamaCtrlProvider.notifier);
+  final ollamaCtrl = ref.watch(ollamaControllerProvider.notifier);
   return ollamaCtrl.getModels();
 }
 
-class OllamaController extends StateNotifier<ModelState> {
-  OllamaController() : super(const ModelState());
+@Riverpod(dependencies: [ollamaBaseUrl])
+class OllamaController extends _$OllamaController {
+  @override
+  ModelState build() {
+    baseUrl = ref.watch(ollamaBaseUrlProvider)!;
+    return const ModelState();
+  }
 
-  final _client = OllamaClient(baseUrl: 'http://10.0.2.2:11434/api');
+  late final String baseUrl;
+  OllamaClient get _client => OllamaClient(baseUrl: baseUrl);
 
   Future<List<Model>> getModels() {
     return _client.listModels().then((val) => val.models ?? []);

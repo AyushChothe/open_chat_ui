@@ -30,4 +30,5 @@ Map<String, dynamic> _$$ModelStateImplToJson(_$ModelStateImpl instance) =>
 const _$ModelStatusEnumMap = {
   ModelStatus.idle: 'idle',
   ModelStatus.running: 'running',
+  ModelStatus.error: 'error',
 };

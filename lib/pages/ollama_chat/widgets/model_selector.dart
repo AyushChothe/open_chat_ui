@@ -7,8 +7,8 @@ class ModelSelector extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ollamaCtrl = ref.watch(ollamaCtrlProvider.notifier);
-    final ollama = ref.watch(ollamaCtrlProvider);
+    final ollamaCtrl = ref.watch(ollamaControllerProvider.notifier);
+    final ollama = ref.watch(ollamaControllerProvider);
     final modelsValue = ref.watch(modelsProvider);
     return Card(
       child: modelsValue.when(

@@ -13,7 +13,7 @@ class MessagesView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ollama = ref.watch(ollamaCtrlProvider);
+    final ollama = ref.watch(ollamaControllerProvider);
 
     final reversedResponses = useMemoized(
       ollama.responses.reversed.toList,
